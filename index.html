@@ -20,9 +20,9 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
+            overflow-y: scroll; /* ARREGLO 1: Obliga a mostrar la barra de scroll siempre para evitar empujones de grilla */
         }
         
-        /* Magia CSS para el cambio de idioma: Oculta lo que no coincide */
         body[data-lang="en"] .lang-es { display: none !important; }
         body[data-lang="es"] .lang-en { display: none !important; }
 
@@ -81,7 +81,6 @@
         .card {
             background-color: var(--card-bg);
             border-radius: 12px;
-            overflow: hidden;
             text-decoration: none;
             color: var(--text-main);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -89,9 +88,17 @@
             display: flex;
             flex-direction: column;
             align-items: stretch;
+            position: relative; /* Necesario para el arreglo 2 */
         }
         
-        /* Arreglo del bug del temblor: ahora solo hace un glow de borde y sombra, no se achica ni mueve */
+        /* ARREGLO 2: Expande de forma invisible el área para que el mouse no se patine */
+        .card::after {
+            content: "";
+            position: absolute;
+            top: -15px; left: -15px; right: -15px; bottom: -15px;
+            z-index: 1; 
+        }
+        
         .card:hover {
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
             border-color: rgba(255, 255, 255, 0.2);
@@ -103,14 +110,25 @@
             background-size: cover;
             background-position: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px 12px 0 0; /* Aplicamos el borde redondeado acá en vez del padre */
+            position: relative;
+            z-index: 2; /* Sube la imagen por encima del área segura invisible */
         }
-        .card-info { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; flex-grow: 1; }
+        .card-info { 
+            padding: 1.5rem; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.8rem; 
+            flex-grow: 1; 
+            position: relative;
+            z-index: 2; /* Sube el texto por encima del área segura invisible */
+        }
         .card-title { font-size: 1.3rem; font-weight: 700; }
         .card-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
         
         .desc-text {
             display: -webkit-box;
-            -webkit-line-clamp: 5; /* 5 líneas en vez de 2 */
+            -webkit-line-clamp: 5;
             -webkit-box-orient: vertical;
             overflow: hidden;
             margin: 0;
@@ -139,11 +157,11 @@
     <main>
         <div class="grid">
             
-        <a href="https://ko-fi.com/k1000k" target="_blank" class="card">
-            <div class="card-img" style="background-image: url('Prueba/imagen.png');"></div>
+        <a href="https://k1ktools.github.io/ultimate-zalgo/" target="_blank" class="card">
+            <div class="card-img lang-es" style="background-image: url('Ultimate Zalgo/imagen_es.png');"></div><div class="card-img lang-en" style="background-image: url('Ultimate Zalgo/imagen_en.png');"></div>
             <div class="card-info">
-                <h2 class="card-title">Prueba</h2>
-                <div class="card-desc"><p class="desc-text">Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción Esta es una prueba de descripción</p></div>
+                <h2 class="card-title">Ultimate Zalgo</h2>
+                <div class="card-desc"><p class="desc-text lang-es">El Generador de Texto Zalgo Definitivo te brinda control absoluto para corromper tu texto sin límites artificiales de intensidad. Ya sea que busques un error sutil o una pesadilla digital total que consuma toda la pantalla, esta herramienta está diseñada para ello.</p><p class="desc-text lang-en">The Ultimate Zalgo Generator gives you absolute control to corrupt your text with zero artificial limits on intensity. Whether you want a subtle glitch or a total digital nightmare that consumes the entire screen, this tool is built for it.</p></div>
             </div>
         </a>
         </div>
@@ -155,7 +173,6 @@
             let currentLang = userLang.toLowerCase().startsWith('es') ? 'es' : 'en';
             
             const updateLanguage = (lang) => {
-                // Magia pura: le cambiamos el atributo al body y CSS se encarga del resto
                 document.body.setAttribute('data-lang', lang);
                 document.getElementById('btn-donar').textContent = lang === 'es' ? 'DONAR' : 'DONATE';
             };
