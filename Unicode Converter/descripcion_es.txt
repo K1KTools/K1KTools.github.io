@@ -1,0 +1,1 @@
+Un codificador y decodificador de texto rápido, en tiempo real y que funciona sin conexión. Convierte al instante entre Texto, Hexadecimal, Binario, Base64, Unicode y muchos formatos más, directamente en tu navegador.

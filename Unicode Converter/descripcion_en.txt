@@ -1,0 +1,1 @@
+A fast, offline, and real-time text encoder and decoder. Convert instantly between Text, Hex, Binary, Base64, Unicode, and many other data formats directly in your browser.
