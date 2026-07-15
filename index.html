@@ -138,8 +138,9 @@
             color: #e2e8f0;
         }
         
-        /* Loader temporal mientras busca los txt */
-        #loader { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; }
+        #loader { text-align: center; color: var(--text-muted); padding: 2rem; line-height: 1.6; }
+        #loader a { color: var(--accent); text-decoration: none; font-weight: bold; }
+        #loader a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -158,15 +159,16 @@
     </header>
 
     <main>
-        <div id="loader">Cargando herramientas...</div>
+        <div id="loader">
+            <span class="lang-es">Cargando herramientas...</span>
+            <span class="lang-en">Loading tools...</span>
+        </div>
         <div class="grid" id="cards-container">
-            <!-- Las tarjetas se generan acá por JavaScript -->
         </div>
     </main>
 
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
-            // Configuración inicial de idioma
             const userLang = navigator.language || navigator.userLanguage;
             let currentLang = userLang.toLowerCase().startsWith('es') ? 'es' : 'en';
             
@@ -183,7 +185,6 @@
                 updateLanguage(e.target.value);
             });
 
-            // Función de fuerza bruta para leer los TXT (falla en silencio devolviendo "")
             const fetchTxt = async (url) => {
                 try {
                     let resp = await fetch(url);
@@ -192,21 +193,18 @@
                 return "";
             };
 
-            // LÓGICA DE RENDERIZADO POR FUERZA BRUTA
             const container = document.getElementById('cards-container');
             const loader = document.getElementById('loader');
 
             try {
-                // Leemos la lista de carpetas
                 let resCarpetas = await fetch('carpetas.txt');
                 if (!resCarpetas.ok) throw new Error("Falta carpetas.txt");
                 let carpetasText = await resCarpetas.text();
                 
-                let carpetas = carpetasText.split('\\n').map(c => c.trim()).filter(c => c !== "");
+                let carpetas = carpetasText.split(/\r?\n/).map(c => c.trim()).filter(c => c !== "");
                 loader.style.display = 'none';
 
                 for (let carpeta of carpetas) {
-                    // Bajamos todos los TXT de esa carpeta en paralelo para que sea más rápido
                     let [link, n_base, n_es, n_en, d_base, d_es, d_en] = await Promise.all([
                         fetchTxt(`${carpeta}/link.txt`),
                         fetchTxt(`${carpeta}/nombre.txt`),
@@ -217,18 +215,15 @@
                         fetchTxt(`${carpeta}/descripcion_en.txt`)
                     ]);
 
-                    // Procesado de link
                     let urlFinal = link ? link : "#";
                     if (urlFinal !== "#" && !urlFinal.startsWith('http')) urlFinal = "https://" + urlFinal;
 
-                    // Procesado de Nombres
                     let nameEs = n_es ? n_es : (n_base ? n_base : carpeta);
                     let nameEn = n_en ? n_en : (n_base ? n_base : carpeta);
                     let titleHtml = (nameEs === nameEn) 
                         ? `<h2 class="card-title">${nameEs}</h2>` 
                         : `<h2 class="card-title lang-es">${nameEs}</h2><h2 class="card-title lang-en">${nameEn}</h2>`;
 
-                    // Procesado de Descripciones
                     let descEs = d_es ? d_es : d_base;
                     let descEn = d_en ? d_en : d_base;
                     if (descEs && !descEn) descEn = descEs;
@@ -243,13 +238,11 @@
                         }
                     }
 
-                    // Fuerza bruta en CSS para las imágenes (Carga imagen_es.png, si da 404, usa imagen.png de respaldo)
                     let imgHtml = `
                         <div class="card-img lang-es" style="background-image: url('${carpeta}/imagen_es.png'), url('${carpeta}/imagen.png');"></div>
                         <div class="card-img lang-en" style="background-image: url('${carpeta}/imagen_en.png'), url('${carpeta}/imagen.png');"></div>
                     `;
 
-                    // Armamos la tarjeta
                     let card = document.createElement('a');
                     card.href = urlFinal;
                     card.target = "_blank";
@@ -269,7 +262,16 @@
                     container.appendChild(card);
                 }
             } catch (err) {
-                loader.textContent = "Error al cargar la lista de herramientas. Revisá que exista 'carpetas.txt'.";
+                loader.innerHTML = `
+                    <div class="lang-es">
+                        No se pudieron cargar las herramientas. Por favor, intentá de nuevo más tarde.<br>
+                        Si el problema persiste, contactame a <a href="mailto:k1000tools@gmail.com">k1000tools@gmail.com</a>.
+                    </div>
+                    <div class="lang-en">
+                        Could not load the tools. Please try again later.<br>
+                        If the problem persists, contact me at <a href="mailto:k1000tools@gmail.com">k1000tools@gmail.com</a>.
+                    </div>
+                `;
             }
         });
     </script>
