@@ -1,0 +1,1 @@
+A 2D physics engine that simulates thousands of particles to reveal custom images. It features invisible background frame-baking for maximum speed, deep physics customization, and instant .webm video exports, all directly in your browser.

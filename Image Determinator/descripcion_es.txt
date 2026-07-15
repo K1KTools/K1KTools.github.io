@@ -1,0 +1,1 @@
+Un simulador físico 2D que calcula la interacción de miles de partículas para revelar imágenes personalizadas. Cuenta con renderizado invisible en segundo plano para máxima velocidad, personalización avanzada de físicas y exportación instantánea de videos .webm, todo directamente en tu navegador.
